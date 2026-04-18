@@ -1,0 +1,12 @@
+[project]
+name = "vision-os-backend"
+version = "0.1.0"
+description = "The OS to design your life."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "django>=6.0.3",
+    "django-environ>=0.13.0",
+    "djangorestframework>=3.17.1",
+    "djangorestframework-simplejwt>=5.5.1",
+]
