@@ -52,3 +52,12 @@ class UnauthenticatedAPIView(BaseAPIView):
 
     authentication_classes = []
     permission_classes = [AllowAny]
+
+
+class HealthCheckView(UnauthenticatedAPIView):
+    """
+    Health check API to verify the service is running.
+    """
+
+    def get(self, request):
+        return self.success(message="Service is healthy")
