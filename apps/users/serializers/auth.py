@@ -1,6 +1,8 @@
 from rest_framework import serializers
+from apps.base.serializers import BaseInputSerializer
 
-class SendOTPSerializer(serializers.Serializer):
+
+class SendOTPSerializer(BaseInputSerializer):
     """Validate the email address for OTP dispatch."""
 
     email = serializers.EmailField(
@@ -11,12 +13,10 @@ class SendOTPSerializer(serializers.Serializer):
         return value.lower().strip()
 
 
-class VerifyOTPSerializer(serializers.Serializer):
+class VerifyOTPSerializer(BaseInputSerializer):
     """Validate email + OTP code pair for authentication."""
 
-    email = serializers.EmailField(
-        help_text="The email address the OTP was sent to."
-    )
+    email = serializers.EmailField(help_text="The email address the OTP was sent to.")
     code = serializers.CharField(
         min_length=6,
         max_length=6,
@@ -32,7 +32,7 @@ class VerifyOTPSerializer(serializers.Serializer):
         return value
 
 
-class TokenRefreshSerializer(serializers.Serializer):
+class TokenRefreshSerializer(BaseInputSerializer):
     """Validate a JWT refresh token for rotation."""
 
     refresh = serializers.CharField(
@@ -40,9 +40,7 @@ class TokenRefreshSerializer(serializers.Serializer):
     )
 
 
-class LogoutSerializer(serializers.Serializer):
+class LogoutSerializer(BaseInputSerializer):
     """Validate a JWT refresh token for blacklisting."""
 
-    refresh = serializers.CharField(
-        help_text="The refresh token to invalidate."
-    )
+    refresh = serializers.CharField(help_text="The refresh token to invalidate.")
