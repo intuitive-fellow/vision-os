@@ -9,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from apps.base.constants import OPTIONAL
 from apps.base.models import BaseModel
 from apps.users.constants import OTP_EXPIRY_MINUTES, OTP_LENGTH
+from apps.users.managers import CustomUserManager
 
 
 class User(AbstractUser, BaseModel):
@@ -21,6 +22,8 @@ class User(AbstractUser, BaseModel):
         _("email address"),
         unique=True,
     )
+
+    objects = CustomUserManager()
 
     # username is kept but hidden from users; auto-generated on creation.
     username = models.CharField(
