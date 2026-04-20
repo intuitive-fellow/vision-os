@@ -13,6 +13,7 @@ from apps.base.exceptions import (
 )
 from apps.users.constants import OTP_MAX_ATTEMPTS
 from apps.users.models import EmailOTP
+from apps.users.services.user import UserService
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -89,7 +90,6 @@ class AuthService:
         otp.save(update_fields=["is_used"])
 
         # Get or create user
-        from apps.users.services.user import UserService  # local import to avoid circular
         user = UserService.get_or_create_by_email(email)
 
         tokens = AuthService._generate_tokens(user)
