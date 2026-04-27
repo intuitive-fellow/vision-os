@@ -1,11 +1,11 @@
 from rest_framework import status
 
 from apps.base.views import BaseAPIView, UnauthenticatedAPIView
-from apps.users.serializers.auth import (
-    LogoutSerializer,
-    SendOTPSerializer,
-    TokenRefreshSerializer,
-    VerifyOTPSerializer,
+from apps.users.schemas.auth import (
+    LogoutSchema,
+    SendOTPSchema,
+    TokenRefreshSchema,
+    VerifyOTPSchema,
 )
 from apps.users.services.auth import AuthService
 from apps.users.services.user import UserService
@@ -18,15 +18,9 @@ class SendOTPView(UnauthenticatedAPIView):
     """
 
     def post(self, request):
-        serializer = SendOTPSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        email = serializer.validated_data["email"]
-        AuthService.send_otp(email=email)
-
-        return self.success(
-            message="Verification code sent. Please check your inbox.",
-        )
+        data = SendOTPSchema.model_validate(request.data)
+        AuthService.send_otp(email=data.email)
+        return self.success(message="Verification code sent. Please check your inbox.")
 
 
 class VerifyOTPView(UnauthenticatedAPIView):
@@ -36,14 +30,8 @@ class VerifyOTPView(UnauthenticatedAPIView):
     """
 
     def post(self, request):
-        serializer = VerifyOTPSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        tokens = AuthService.verify_otp(
-            email=serializer.validated_data["email"],
-            code=serializer.validated_data["code"],
-        )
-
+        data = VerifyOTPSchema.model_validate(request.data)
+        tokens = AuthService.verify_otp(email=data.email, code=data.code)
         return self.success(
             data=tokens,
             message="Authentication successful.",
@@ -57,13 +45,8 @@ class TokenRefreshView(UnauthenticatedAPIView):
     """
 
     def post(self, request):
-        serializer = TokenRefreshSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        tokens = AuthService.refresh_token(
-            refresh_token_str=serializer.validated_data["refresh"],
-        )
-
+        data = TokenRefreshSchema.model_validate(request.data)
+        tokens = AuthService.refresh_token(refresh_token_str=data.refresh)
         return self.success(data=tokens, message="Token refreshed.")
 
 
@@ -73,13 +56,8 @@ class LogoutView(BaseAPIView):
     """
 
     def post(self, request):
-        serializer = LogoutSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        AuthService.logout(
-            refresh_token_str=serializer.validated_data["refresh"],
-        )
-
+        data = LogoutSchema.model_validate(request.data)
+        AuthService.logout(refresh_token_str=data.refresh)
         return self.no_content()
 
 

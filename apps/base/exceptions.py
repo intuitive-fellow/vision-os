@@ -4,6 +4,7 @@ from django.core.exceptions import PermissionDenied as DjangoPermissionDenied
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.http import Http404
 
+from pydantic import ValidationError as PydanticValidationError
 from rest_framework import exceptions, status
 from rest_framework.exceptions import (
     APIException,
@@ -123,6 +124,17 @@ def custom_exception_handler(exc, context):
     if isinstance(exc, DjangoPermissionDenied):
         exc = exceptions.PermissionDenied()
 
+    # --- Pydantic ValidationError ---
+    if isinstance(exc, PydanticValidationError):
+        return Response(
+            {
+                "success": False,
+                "message": "Validation error.",
+                "errors": _format_pydantic_errors(exc),
+            },
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
     # Let DRF handle it first to get the default response (sets status codes etc.)
     response = exception_handler(exc, context)
 
@@ -157,6 +169,14 @@ def custom_exception_handler(exc, context):
         },
         status=status.HTTP_500_INTERNAL_SERVER_ERROR,
     )
+
+
+def _format_pydantic_errors(exc: PydanticValidationError) -> dict:
+    errors: dict[str, list] = {}
+    for error in exc.errors():
+        field = str(error["loc"][0]) if error["loc"] else "non_field"
+        errors.setdefault(field, []).append(error["msg"])
+    return errors
 
 
 def _extract_drf_exception(exc, response):

@@ -10,4 +10,5 @@ dependencies = [
     "django-unfold>=0.90.0",
     "djangorestframework>=3.17.1",
     "djangorestframework-simplejwt>=5.5.1",
+    "pydantic[email]>=2.13.3",
 ]
